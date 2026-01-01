@@ -9,7 +9,7 @@ Spring Boot와 Spring Data JPA를 활용하여
 https://documenter.getpostman.com/view/50422128/2sBXVbHtVK
 ---
 ### 🗃️ ERD
-<img width="681" height="292" alt="image" src="https://github.com/user-attachments/assets/a0f2bd85-3ca6-4c54-937a-ecf0210e1c49" />
+<img width="674" height="281" alt="image" src="https://github.com/user-attachments/assets/ac93317e-c07c-4c6b-9597-bf3519f694db" />
 
 ### 설계 구조
 
@@ -47,7 +47,7 @@ https://documenter.getpostman.com/view/50422128/2sBXVbHtVK
 - 일정 ID로 삭제
 - 삭제 시 비밀번호 검증
 
-### ✅ Lv 5. 댓글 추가
+### ✅ Lv 5. 댓글 기능
 - 일정에 댓글을 작성할 수 있는 기능 구현
 - 하나의 일정에는 최대 10개의 댓글 작성 가능
 - 댓글에는 댓글 내용, 작성자명, 비밀번호, 작성일, 수정일이 저장
