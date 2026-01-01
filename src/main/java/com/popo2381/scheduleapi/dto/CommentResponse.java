@@ -3,7 +3,9 @@ package com.popo2381.scheduleapi.dto;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-
+/**
+ * 댓글 생성/수정 응답 DTO
+ */
 @Getter
 public class CommentResponse {
     private final Long id;

@@ -61,18 +61,22 @@ public class CommentService {
     }
 
     public CommentResponse update(Long scheduleId, Long commentId, CommentRequest request) {
+        // 일정이 존재하는지 확인
         scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalArgumentException("Schedule not found with id " + scheduleId)
         );
+        // 댓글이 존재하는지 확인
         Comment comment = commentRepository.findById(commentId).orElseThrow(
                 () -> new IllegalArgumentException("Comment not found with id " + commentId)
         );
-        if (!request.getPassword().equals(comment.getPassword())) {
-            throw new IllegalArgumentException("Passwords don't match");
-        }
+        // 해당 일정의 댓글이 맞는지 검증
         if (!comment.getSchedule().getId().equals(scheduleId)) {
             throw new IllegalArgumentException("Comment not found with id " + commentId);
         };
+        // 비밀번호 검증
+        if (!request.getPassword().equals(comment.getPassword())) {
+            throw new IllegalArgumentException("Passwords don't match");
+        }
         comment.update(request.getWriter(),request.getContent());
         scheduleRepository.flush();
         return new CommentResponse(

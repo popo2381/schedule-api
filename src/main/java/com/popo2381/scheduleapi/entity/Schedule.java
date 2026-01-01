@@ -23,7 +23,7 @@ public class Schedule extends BaseEntity{
     @Column(length = 200, nullable = false)
     private String content;
 
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String writer;
 
     @Column(length = 20, nullable = false)
