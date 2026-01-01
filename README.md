@@ -5,11 +5,11 @@ Spring Boot와 Spring Data JPA를 활용하여
 본 프로젝트는 **3-Layer Architecture** 기반으로 설계되었으며,
 **JPA Auditing**을 활용하여 작성일/수정일을 자동 관리합니다.
 
-### API 명세서
+### 📄 API 명세서
 https://documenter.getpostman.com/view/50422128/2sBXVbHtVK
 ---
-### ERD
-<img width="703" height="321" alt="image" src="https://github.com/user-attachments/assets/45003739-f5ca-4ce5-b1c8-745cafa4554a" />
+### 🗃️ ERD
+<img width="681" height="292" alt="image" src="https://github.com/user-attachments/assets/a0f2bd85-3ca6-4c54-937a-ecf0210e1c49" />
 
 ### 설계 구조
 
@@ -47,6 +47,18 @@ https://documenter.getpostman.com/view/50422128/2sBXVbHtVK
 - 일정 ID로 삭제
 - 삭제 시 비밀번호 검증
 
+### ✅ Lv 5. 댓글 추가
+- 일정에 댓글을 작성할 수 있는 기능 구현
+- 하나의 일정에는 최대 10개의 댓글 작성 가능
+- 댓글에는 댓글 내용, 작성자명, 비밀번호, 작성일, 수정일이 저장
+- 댓글은 반드시 하나의 일정에 소속되며, 일정 ID를 외래키로 가짐
+- API응답에서 비밀번호 제외
+
+### ✅ Lv 6. 일정 단건 조회 시 댓글 표시 기능 추가
+
+### ✅ Lv 7. 입력값 검증
+
+
 ### 🔐 비밀번호 처리 정책
 
 - 비밀번호는 일정 수정/삭제 시 검증 용도로만 사용
@@ -66,3 +78,4 @@ src/main/java
 └─ dto # Request / Response DTO
 ```
 
+📝 작성 참고 사이트: https://duektmf34.tistory.com/206
