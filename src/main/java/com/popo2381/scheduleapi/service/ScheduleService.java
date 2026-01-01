@@ -14,13 +14,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
+    private final CommentService commentService;
 
     @Transactional
     public CreateScheduleResponse save(CreateScheduleRequest request) {
         Schedule schedule = new Schedule(
                 request.getTitle(),
                 request.getContent(),
-                request.getName(),
+                request.getWriter(),
                 request.getPassword()
         );
         Schedule savedSchedule = scheduleRepository.save(schedule);
@@ -28,7 +29,7 @@ public class ScheduleService {
                 savedSchedule.getId(),
                 savedSchedule.getTitle(),
                 savedSchedule.getContent(),
-                savedSchedule.getName(),
+                savedSchedule.getWriter(),
                 savedSchedule.getCreatedAt(),
                 savedSchedule.getModifiedAt()
         );
@@ -43,36 +44,37 @@ public class ScheduleService {
                 schedule.getId(),
                 schedule.getTitle(),
                 schedule.getContent(),
-                schedule.getName(),
+                schedule.getWriter(),
                 schedule.getCreatedAt(),
-                schedule.getModifiedAt()
+                schedule.getModifiedAt(),
+                commentService.findAllByScheduleId(scheduleId)
         );
     }
 
     @Transactional(readOnly = true)
-    public List<GetScheduleResponse> findAllByName(String name) {
-        if (name == null || name.isBlank()) {
+    public List<GetAllScheduleResponse> findAllByWriter(String writer) {
+        if (writer == null || writer.isBlank()) {
             List<Schedule> schedules = scheduleRepository.findAll();
             return schedules.stream()
                     .map(
-                            schedule -> new GetScheduleResponse(
+                            schedule -> new GetAllScheduleResponse(
                                     schedule.getId(),
                                     schedule.getTitle(),
                                     schedule.getContent(),
-                                    schedule.getName(),
+                                    schedule.getWriter(),
                                     schedule.getCreatedAt(),
                                     schedule.getModifiedAt()
                             )
                     ).toList();
         }
-        List<Schedule> schedules = scheduleRepository.findByName(name);
-        List<GetScheduleResponse> dtos = new ArrayList<>();
+        List<Schedule> schedules = scheduleRepository.findByWriter(writer);
+        List<GetAllScheduleResponse> dtos = new ArrayList<>();
         for (Schedule schedule : schedules) {
-            GetScheduleResponse dto = new GetScheduleResponse(
+            GetAllScheduleResponse dto = new GetAllScheduleResponse(
                     schedule.getId(),
                     schedule.getTitle(),
                     schedule.getContent(),
-                    schedule.getName(),
+                    schedule.getWriter(),
                     schedule.getCreatedAt(),
                     schedule.getModifiedAt()
             );
@@ -86,16 +88,16 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new IllegalArgumentException("Schedule not found with id " + scheduleId)
         );
-        if (!request.getPassword().equals(scheduleRepository.findById(scheduleId).get().getPassword())) {
+        if (!request.getPassword().equals(schedule.getPassword())) {
             throw new IllegalArgumentException("Passwords don't match");
         }
-        schedule.updateTitleAndName(request.getTitle(), request.getName());
+        schedule.updateTitleAndName(request.getTitle(), request.getWriter());
         scheduleRepository.flush();
         return new UpdateScheduleResponse(
                 schedule.getId(),
                 schedule.getTitle(),
                 schedule.getContent(),
-                schedule.getName(),
+                schedule.getWriter(),
                 schedule.getCreatedAt(),
                 schedule.getModifiedAt()
         );
