@@ -17,4 +17,8 @@ public class CommentController {
     public ResponseEntity<CommentResponse> createComment(@PathVariable Long scheduleId, @RequestBody CommentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(commentService.save(scheduleId, request));
     }
+    @PutMapping("/schedules/{scheduleId}/comments/{commentId}")
+    public ResponseEntity<CommentResponse> updateComment(@PathVariable Long scheduleId, @PathVariable Long commentId, @RequestBody CommentRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.update(scheduleId,commentId,request));
+    }
 }

@@ -2,11 +2,13 @@ package com.popo2381.scheduleapi.service;
 
 import com.popo2381.scheduleapi.dto.CommentRequest;
 import com.popo2381.scheduleapi.dto.CommentResponse;
+import com.popo2381.scheduleapi.dto.UpdateScheduleResponse;
 import com.popo2381.scheduleapi.entity.Comment;
 import com.popo2381.scheduleapi.entity.Schedule;
 import com.popo2381.scheduleapi.repository.CommentRepository;
 import com.popo2381.scheduleapi.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,5 +58,29 @@ public class CommentService {
                         comment.getCreatedAt(),
                         comment.getModifiedAt()
                 )).toList();
+    }
+
+    public CommentResponse update(Long scheduleId, Long commentId, CommentRequest request) {
+        scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new IllegalArgumentException("Schedule not found with id " + scheduleId)
+        );
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new IllegalArgumentException("Comment not found with id " + commentId)
+        );
+        if (!request.getPassword().equals(comment.getPassword())) {
+            throw new IllegalArgumentException("Passwords don't match");
+        }
+        if (!comment.getSchedule().getId().equals(scheduleId)) {
+            throw new IllegalArgumentException("Comment not found with id " + commentId);
+        };
+        comment.update(request.getWriter(),request.getContent());
+        scheduleRepository.flush();
+        return new CommentResponse(
+                comment.getId(),
+                comment.getContent(),
+                comment.getWriter(),
+                comment.getCreatedAt(),
+                comment.getModifiedAt()
+        );
     }
 }
