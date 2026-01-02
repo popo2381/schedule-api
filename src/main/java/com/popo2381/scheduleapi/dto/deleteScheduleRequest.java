@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class deleteScheduleRequest {
-    @NotBlank(message = "비밀번호를 입력해주세요.")
+    @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
     private String password;
 }

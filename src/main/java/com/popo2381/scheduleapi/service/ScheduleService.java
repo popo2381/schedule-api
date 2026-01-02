@@ -2,6 +2,8 @@ package com.popo2381.scheduleapi.service;
 
 import com.popo2381.scheduleapi.dto.*;
 import com.popo2381.scheduleapi.entity.Schedule;
+import com.popo2381.scheduleapi.exception.InvalidPasswordException;
+import com.popo2381.scheduleapi.exception.ScheduleNotFoundException;
 import com.popo2381.scheduleapi.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,7 +40,7 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public GetScheduleResponse findOne(Long scheduleId) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new IllegalArgumentException("Schedule not found with id " + scheduleId)
+                () -> new ScheduleNotFoundException(scheduleId)
         );
         return new GetScheduleResponse(
                 schedule.getId(),
@@ -86,10 +88,10 @@ public class ScheduleService {
     @Transactional
     public UpdateScheduleResponse updateTitleAndName(Long scheduleId, UpdateScheduleRequest request) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new IllegalArgumentException("Schedule not found with id " + scheduleId)
+                () -> new ScheduleNotFoundException(scheduleId)
         );
         if (!request.getPassword().equals(schedule.getPassword())) {
-            throw new IllegalArgumentException("Passwords don't match");
+            throw new InvalidPasswordException();
         }
         schedule.updateTitleAndName(request.getTitle(), request.getWriter());
         scheduleRepository.flush();
@@ -107,10 +109,10 @@ public class ScheduleService {
     public Void delete(Long scheduleId, deleteScheduleRequest request) {
         boolean existence = scheduleRepository.existsById(scheduleId);
         if (!existence) {
-            throw new IllegalArgumentException("Schedule not found with id " + scheduleId);
+            throw new ScheduleNotFoundException(scheduleId);
         }
         if (!request.getPassword().equals(scheduleRepository.findById(scheduleId).get().getPassword())) {
-            throw new IllegalArgumentException("Passwords don't match");
+            throw new InvalidPasswordException();
         }
         scheduleRepository.deleteById(scheduleId);
         return null;

@@ -5,6 +5,10 @@ import com.popo2381.scheduleapi.dto.CommentResponse;
 import com.popo2381.scheduleapi.dto.UpdateScheduleResponse;
 import com.popo2381.scheduleapi.entity.Comment;
 import com.popo2381.scheduleapi.entity.Schedule;
+import com.popo2381.scheduleapi.exception.CommentLimitExceededException;
+import com.popo2381.scheduleapi.exception.CommentNotFoundException;
+import com.popo2381.scheduleapi.exception.InvalidPasswordException;
+import com.popo2381.scheduleapi.exception.ScheduleNotFoundException;
 import com.popo2381.scheduleapi.repository.CommentRepository;
 import com.popo2381.scheduleapi.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +28,11 @@ public class CommentService {
     public CommentResponse save(Long scheduleId, CommentRequest request) {
         // 해당 스케줄 존재 여부 확인
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new IllegalArgumentException("Schedule not found with id " + scheduleId)
+                () -> new ScheduleNotFoundException(scheduleId)
         );
         // 해당 스케줄id를 10개 가지고 있는 댓글 체크
         if(commentRepository.countByScheduleId(scheduleId) >= 10) {
-            throw new IllegalArgumentException("댓글은 일정당 최대 10개까지 작성할 수 있습니다.");
+            throw new CommentLimitExceededException();
         }
         // comment가 FK를 가지므로 생성 시에 schedule 객체를 넣어서 관계를 이어줌
         Comment comment = new Comment(
@@ -63,19 +67,19 @@ public class CommentService {
     public CommentResponse update(Long scheduleId, Long commentId, CommentRequest request) {
         // 일정이 존재하는지 확인
         scheduleRepository.findById(scheduleId).orElseThrow(
-                () -> new IllegalArgumentException("Schedule not found with id " + scheduleId)
+                () -> new ScheduleNotFoundException(scheduleId)
         );
         // 댓글이 존재하는지 확인
         Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new IllegalArgumentException("Comment not found with id " + commentId)
+                () -> new CommentNotFoundException(commentId)
         );
         // 해당 일정의 댓글이 맞는지 검증
         if (!comment.getSchedule().getId().equals(scheduleId)) {
-            throw new IllegalArgumentException("Comment not found with id " + commentId);
+            throw new CommentNotFoundException(commentId);
         };
         // 비밀번호 검증
         if (!request.getPassword().equals(comment.getPassword())) {
-            throw new IllegalArgumentException("Passwords don't match");
+            throw new InvalidPasswordException();
         }
         comment.update(request.getWriter(),request.getContent());
         scheduleRepository.flush();
