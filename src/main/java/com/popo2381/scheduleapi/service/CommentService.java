@@ -64,6 +64,7 @@ public class CommentService {
                 )).toList();
     }
 
+    @Transactional
     public CommentResponse update(Long scheduleId, Long commentId, CommentRequest request) {
         // 일정이 존재하는지 확인
         scheduleRepository.findById(scheduleId).orElseThrow(

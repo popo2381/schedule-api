@@ -4,6 +4,7 @@ import com.popo2381.scheduleapi.dto.*;
 import com.popo2381.scheduleapi.entity.Schedule;
 import com.popo2381.scheduleapi.exception.InvalidPasswordException;
 import com.popo2381.scheduleapi.exception.ScheduleNotFoundException;
+import com.popo2381.scheduleapi.repository.CommentRepository;
 import com.popo2381.scheduleapi.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.List;
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final CommentService commentService;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public CreateScheduleResponse save(CreateScheduleRequest request) {
@@ -42,6 +44,15 @@ public class ScheduleService {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
                 () -> new ScheduleNotFoundException(scheduleId)
         );
+        List<CommentResponse> comments = commentRepository.findAllByScheduleId(scheduleId).stream().
+                map(comment -> new CommentResponse(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getWriter(),
+                        comment.getCreatedAt(),
+                        comment.getModifiedAt()
+                )).toList();
+
         return new GetScheduleResponse(
                 schedule.getId(),
                 schedule.getTitle(),
@@ -49,7 +60,7 @@ public class ScheduleService {
                 schedule.getWriter(),
                 schedule.getCreatedAt(),
                 schedule.getModifiedAt(),
-                commentService.findAllByScheduleId(scheduleId)
+                comments
         );
     }
 
@@ -106,12 +117,11 @@ public class ScheduleService {
     }
 
     @Transactional
-    public Void delete(Long scheduleId, deleteScheduleRequest request) {
-        boolean existence = scheduleRepository.existsById(scheduleId);
-        if (!existence) {
-            throw new ScheduleNotFoundException(scheduleId);
-        }
-        if (!request.getPassword().equals(scheduleRepository.findById(scheduleId).get().getPassword())) {
+    public Void delete(Long scheduleId, DeleteScheduleRequest request) {
+        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
+                () -> new ScheduleNotFoundException(scheduleId)
+        );
+        if (!request.getPassword().equals(schedule.getPassword())) {
             throw new InvalidPasswordException();
         }
         scheduleRepository.deleteById(scheduleId);
